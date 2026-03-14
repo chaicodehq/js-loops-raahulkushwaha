@@ -46,4 +46,54 @@
  */
 export function railwayReservation(passengers, trains) {
   // Your code here
+
+  if (!Array.isArray(passengers) || !Array.isArray(trains) || passengers.length === 0 || trains.length === 0)
+    return [];
+
+  let finalReservations = [];
+
+   for (const passenger of passengers) {
+    const { name, trainNumber, preferred, fallback } = passenger;
+    
+    // Step 1: Train dhoondo
+    let targetTrain = null;
+    for (const train of trains) {
+      if (train.trainNumber === trainNumber) {
+        targetTrain = train;
+        break;
+      }
+    }
+
+    // Step 2: Agar train nahi mili
+    if (!targetTrain) {
+      finalReservations.push({ 
+        name, trainNumber, class: null, status: "train_not_found" 
+      });
+      continue;
+    }
+
+    // Step 3: Try Preferred Class
+    if (targetTrain.seats[preferred] > 0) {
+      targetTrain.seats[preferred]--; // Seat kam karo!
+      finalReservations.push({ 
+        name, trainNumber, class: preferred, status: "confirmed" 
+      });
+    } 
+    // Step 4: Try Fallback Class
+    else if (targetTrain.seats[fallback] > 0) {
+      targetTrain.seats[fallback]--; // Seat kam karo!
+      finalReservations.push({ 
+        name, trainNumber, class: fallback, status: "confirmed" 
+      });
+    } 
+    // Step 5: Waitlist (Neither available)
+    else {
+      finalReservations.push({ 
+        name, trainNumber, class: preferred, status: "waitlisted" 
+      });
+    }
+  }
+
+  return finalReservations;
+
 }
